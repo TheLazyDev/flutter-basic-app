@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import './question.dart';
-import './answer.dart';
+import "./quiz.dart";
+import "./result.dart";
 
 class MyApp extends StatefulWidget {
   @override
@@ -11,59 +11,75 @@ class MyApp extends StatefulWidget {
 }
 
 class _MyAppState extends State<MyApp> {
-  var questionIndex = 0;
-  const questions = [
+  var _questionIndex = 0;
+  final _questions = const [
     {
       "questionText": "What's your favoruite color?",
-      "answers": ["Black", "Red", "Green"]
+      "answers": [
+        {
+          "text": "Black",
+          "score": 10,
+        },
+        {
+          "text": "Red",
+          "score": 5,
+        },
+        {
+          "text": "Green",
+          "score": 2,
+        },
+      ]
     },
     {
-      "questionText": "What's your favourite furit",
-      "answers": ["Apple", "Banana", "Orange"]
+      "questionText": "What's your favourite fruit",
+      "answers": [
+        {
+          "text": "Apple",
+          "score": 10,
+        },
+        {
+          "text": "Orange",
+          "score": 5,
+        },
+        {
+          "text": "Grapes",
+          "score": 2,
+        },
+      ]
     }
-    ];
-  void answerQuestion() {
+  ];
+
+  int _totalScore = 0;
+  Function _answerQuestion(int score) => () {
+        if (_questionIndex < _questions.length) {
+          _totalScore += score;
+          setState(() {
+            _questionIndex++;
+          });
+        }
+      };
+
+  void _resetQuiz(){
     setState(() {
-      questionIndex++;
+      _totalScore = 0;
+      _questionIndex = 0;
     });
-
-    print(questionIndex);
   }
-
   @override
   Widget build(BuildContext context) {
- 
-    const questions = [
-      {
-        "questionText": "What's your favoruite color?",
-        "answers": ["Black", "Red", "Green"]
-      },
-      {
-        "questionText": "What's your favourite furit",
-        "answers": ["Apple", "Banana", "Orange"]
-      }
-    ];
     // TODO: implement build
     return MaterialApp(
         home: Scaffold(
-      appBar: AppBar(
-        title: Text("FirstApp"),
-      ),
-      body: Column(
-        children: [
-          Question(questions[questionIndex]["questionText"]),
-          ...(questions[questionIndex]["answers"] as List<String>)
-              .map((answer) => Answer(
-                    answer: answer,
-                    answerHandler: answerQuestion,
-                  ))
-              .toList()
-          // Answer(answerQuestion),
-          // Answer(answerQuestion),
-          // Answer(answerQuestion),
-        ],
-      ),
-    ));
+            appBar: AppBar(
+              title: Text("FirstApp"),
+            ),
+            body: _questionIndex < _questions.length
+                ? Quiz(
+                    questions: _questions,
+                    answerHanlder: _answerQuestion,
+                    questionIndex: _questionIndex,
+                  )
+                : Result(resultScore: _totalScore, resetHandler: _resetQuiz,)));
   }
 }
 
